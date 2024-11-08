@@ -25,6 +25,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
@@ -35,7 +36,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.PopupMenu;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
@@ -73,9 +76,23 @@ public class GLActivity extends Activity implements PropertyChangeListener {
 	
 		mGLSurfaceView.setRenderer(mRenderer);
 	    mGLSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
-	    
+
+           // For TVs, put an alternative button on UI to upload reports
+           boolean isTv = getPackageManager().hasSystemFeature(PackageManager.FEATURE_LEANBACK);
+           Button menuButton = findViewById(R.id.button_second_menu);
+           if(isTv) {
+             menuButton.setOnClickListener(v -> showPopupMenu(v));
+           } else {
+             menuButton.setVisibility(View.GONE);
+           }
 	}
 	
+        private void showPopupMenu(View anchorView) {
+            PopupMenu popupMenu = new PopupMenu(this, anchorView);
+            popupMenu.getMenuInflater().inflate(R.menu.main_activity_actions, popupMenu.getMenu());
+            popupMenu.setOnMenuItemClickListener(this::onOptionsItemSelected);
+            popupMenu.show();
+        }
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
